@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>Linear
+
+    <declare-styleable name="FlexGridGroup">
+        <attr name="horizontalGap" format="dimension"/>
+        <attr name="verticalGap" format="dimension"/>
+    </declare-styleable>
+</resources>

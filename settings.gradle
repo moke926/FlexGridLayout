@@ -8,3 +8,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "FlexGridLayout"
 include ':app'
+include ':flexgrid'
