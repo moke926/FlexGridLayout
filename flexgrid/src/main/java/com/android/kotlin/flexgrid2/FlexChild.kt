@@ -1,6 +1,4 @@
-package com.android.moke.flexgrid
-
-import android.graphics.Rect
+package com.android.kotlin.flexgrid2
 
 interface FlexChild {
 

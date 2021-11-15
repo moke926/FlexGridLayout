@@ -1,4 +1,4 @@
-package com.android.moke.flexgrid
+package com.android.kotlin.flexgrid2
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.android.moke.flexgrid.test", appContext.packageName)
+        assertEquals("com.android.kotlin.flexgrid2.test", appContext.packageName)
     }
 }
