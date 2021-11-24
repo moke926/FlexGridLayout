@@ -1,4 +1,4 @@
-package com.android.kotlin.flexgrid2
+package com.android.flexgrid2
 
 import android.content.Context
 import android.os.Build
@@ -6,10 +6,11 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.NonNull
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class FlexGridGroup
+class FlexGridGroup<D>
 @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) :
     ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
 
@@ -21,6 +22,8 @@ class FlexGridGroup
 
     var mHorizontalGap = 0
     var mVerticalGap = 0
+
+    private var mCallBackList: ArrayList<OnDataBindCallBack<D>> = ArrayList()
 
     init {
         val typeArray = context.obtainStyledAttributes(attrs, R.styleable.FlexGridGroup, defStyleAttr, defStyleRes)
@@ -91,22 +94,61 @@ class FlexGridGroup
         }
     }
 
-
-    fun injectView(child: FlexChild){
-        when(child){
-            is View -> {
-                addView(child)
-            }
-            else -> {
-                //use default Flex GridView
-                val view = FlexView(context).apply {
-                    setCoordinate(child.getStartCoordinate(), child.getEndCoordinate())
-                }
-                addView(view)
+    fun addGrids(list: List<FlexChild>){
+        removeAllViews()
+        if (list.isNotEmpty()){
+            list.forEachIndexed { _, flexChild ->
+                injectView(flexChild)
             }
         }
     }
 
 
+    private fun injectView(child: FlexChild){
+        when(child){
+            is View -> {
+                addView(child)
+            }
+            else -> {
+                val flexView = FlexView(context).apply {
+                    setCoordinate(child.getStartCoordinate(), child.getEndCoordinate())
+                }
+                addView(flexView)
+            }
+        }
+    }
 
+
+    private fun bindAdapterData(list: List<D>){
+        for (index in 0 until childCount){
+            val child = getChildAt(index) as? FlexChild
+            val data = list.getOrNull(index)
+            if(data != null && child != null) {
+                mCallBackList.forEach {
+                    it.onBind(data, child)
+                }
+            }
+        }
+    }
+
+    fun addCallBack(@NonNull callBack: OnDataBindCallBack<D>){
+        mCallBackList.add(callBack)
+    }
+
+    fun removeCallBack(@NonNull callBack: OnDataBindCallBack<D>){
+        mCallBackList.remove(callBack)
+    }
+
+    fun recycle(){
+        mCallBackList.clear()
+    }
+
+    fun submitData(list: List<D>){
+        bindAdapterData(list)
+    }
 }
+
+interface OnDataBindCallBack<T>{
+    fun onBind(data: T, child: FlexChild)
+}
+

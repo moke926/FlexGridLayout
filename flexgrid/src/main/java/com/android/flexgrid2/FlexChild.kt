@@ -1,4 +1,4 @@
-package com.android.kotlin.flexgrid2
+package com.android.flexgrid2
 
 interface FlexChild {
 
