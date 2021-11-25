@@ -1,7 +1,9 @@
 package com.android.kotlin.flexgridlayout
 
+import android.graphics.Rect
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.annotation.DrawableRes
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -12,6 +14,7 @@ import kotlin.random.Random
 data class FlexItem(@DrawableRes val picRes: Int)
 data class FlexGroup(val index: Int, val itemList: List<FlexItem>)
 class MainActivity : AppCompatActivity() {
+
 
     private val mData = MutableLiveData<List<FlexGroup>>()
     init {
@@ -37,7 +40,19 @@ class MainActivity : AppCompatActivity() {
         val recyclerView = binding.rvTest
         val adapter = TestAdapter()
         recyclerView.adapter = adapter
+        val mHorizontalGap = resources.getDimensionPixelOffset(R.dimen.test_horizontal_gap)
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
+        val itemDecoration = object : RecyclerView.ItemDecoration() {
+            override fun getItemOffsets(
+                outRect: Rect,
+                view: View,
+                parent: RecyclerView,
+                state: RecyclerView.State
+            ) {
+                outRect.bottom = mHorizontalGap
+            }
+        }
+        recyclerView.addItemDecoration(itemDecoration)
         mData.observe(this, adapter)
     }
 }

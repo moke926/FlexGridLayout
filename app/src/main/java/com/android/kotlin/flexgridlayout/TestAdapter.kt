@@ -23,13 +23,15 @@ class TestAdapter: ListAdapter<FlexGroup, TestAdapter.MyViewHolder>(object: Item
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val flexGroupView = FlexGridGroup<FlexItem>(parent.context).apply {
-            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
             val list = DefaultLayoutConfiguration.generateGroup(parent.context, viewType)
             addGrids(list)
             addCallBack(DataCallBack())
         }
-        val holder = MyViewHolder(flexGroupView)
-        return holder
+        return MyViewHolder(flexGroupView)
     }
 
     override fun getItemViewType(position: Int): Int {

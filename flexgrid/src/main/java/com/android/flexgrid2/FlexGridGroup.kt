@@ -41,10 +41,9 @@ class FlexGridGroup<D>
         for(index in 0 until childCount){
             val child = getChildAt(index)
             if(child.visibility != GONE) {
-                measureChild(child, widthMeasureSpec, heightMeasureSpec)
                 (child as? FlexChild)?.also {
-                    maxXUnits = max(maxXUnits, it.getEndCoordinate().second)
-                    maxYUnits = max(maxYUnits, it.getEndCoordinate().first)
+                    maxXUnits = max(maxXUnits, it.getEndCoordinate().second + 1)
+                    maxYUnits = max(maxYUnits, it.getEndCoordinate().first + 1)
                 }
             }
         }

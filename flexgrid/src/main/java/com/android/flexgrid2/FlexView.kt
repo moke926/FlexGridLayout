@@ -3,6 +3,7 @@ package com.android.flexgrid2
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
+import kotlin.math.roundToInt
 
 class FlexView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0) :
@@ -25,5 +26,12 @@ class FlexView @JvmOverloads constructor(
 
     override fun getEndCoordinate(): Pair<Int, Int> {
         return mEndCoordinate
+    }
+
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val ratio = getHeightUnits() / getWidthUnits().toFloat()
+        val width = MeasureSpec.getSize(widthMeasureSpec)
+        val height = (width * ratio).roundToInt()
+        setMeasuredDimension(width, height)
     }
 }
