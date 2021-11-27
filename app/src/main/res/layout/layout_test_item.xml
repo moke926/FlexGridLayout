@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.android.flexgrid2.FlexGridGroup
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    tools:ignore="MissingDefaultResource"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    app:horizontalGap="2dp"
+    app:verticalGap="2dp">
+
+</com.android.flexgrid2.FlexGridGroup>
