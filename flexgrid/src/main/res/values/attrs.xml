@@ -4,5 +4,6 @@
     <declare-styleable name="FlexGridGroup">
         <attr name="horizontalGap" format="dimension"/>
         <attr name="verticalGap" format="dimension"/>
+        <attr name="standUnitSize" format="dimension"/>
     </declare-styleable>
 </resources>

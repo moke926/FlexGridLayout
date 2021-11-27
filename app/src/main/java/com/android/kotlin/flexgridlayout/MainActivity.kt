@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         val recyclerView = binding.rvTest
         val adapter = TestAdapter()
         recyclerView.adapter = adapter
-        val mHorizontalGap = resources.getDimensionPixelOffset(R.dimen.test_horizontal_gap)
+        val mVerticalGap = resources.getDimensionPixelOffset(R.dimen.test_vertical_gap)
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
         val itemDecoration = object : RecyclerView.ItemDecoration() {
             override fun getItemOffsets(
@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
                 parent: RecyclerView,
                 state: RecyclerView.State
             ) {
-                outRect.bottom = mHorizontalGap
+                outRect.bottom = mVerticalGap
             }
         }
         recyclerView.addItemDecoration(itemDecoration)

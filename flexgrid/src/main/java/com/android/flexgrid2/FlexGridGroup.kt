@@ -6,11 +6,11 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.NonNull
+import androidx.core.view.ViewCompat
 import kotlin.math.max
 import kotlin.math.roundToInt
 
-class FlexGridGroup<D>
+open class FlexGridGroup
 @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, defStyleRes: Int = 0) :
     ViewGroup(context, attrs, defStyleAttr, defStyleRes) {
 
@@ -18,12 +18,11 @@ class FlexGridGroup<D>
         const val TAG = "FlexGridGroup"
     }
 
-    var mStandardUnitSize = 0
+    private var mStandardUnitSize: Int
+    private var mHorizontalGap = 0
+    private var mVerticalGap = 0
 
-    var mHorizontalGap = 0
-    var mVerticalGap = 0
-
-    private var mCallBackList: ArrayList<OnDataBindCallBack<D>> = ArrayList()
+    private var mAdapter: FlexAdapter<*>? = null
 
     init {
         val typeArray = context.obtainStyledAttributes(attrs, R.styleable.FlexGridGroup, defStyleAttr, defStyleRes)
@@ -32,12 +31,14 @@ class FlexGridGroup<D>
         }
         mHorizontalGap = typeArray.getDimensionPixelOffset(R.styleable.FlexGridGroup_horizontalGap, mHorizontalGap)
         mVerticalGap = typeArray.getDimensionPixelOffset(R.styleable.FlexGridGroup_verticalGap, mVerticalGap)
+        mStandardUnitSize = typeArray.getDimensionPixelSize(R.styleable.FlexGridGroup_standUnitSize, 0)
         typeArray.recycle()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         var maxYUnits = 0
         var maxXUnits = 0
+
         for(index in 0 until childCount){
             val child = getChildAt(index)
             if(child.visibility != GONE) {
@@ -50,27 +51,52 @@ class FlexGridGroup<D>
 
         if(maxXUnits > 0 && maxYUnits > 0){
             val containerWidth = MeasureSpec.getSize(widthMeasureSpec)
-            when(MeasureSpec.getMode(widthMeasureSpec)){
-                MeasureSpec.EXACTLY ->{
+            var widthType = MeasureSpec.getMode(widthMeasureSpec)
+            if(widthType == MeasureSpec.AT_MOST && mStandardUnitSize <= 0){
+                widthType = MeasureSpec.EXACTLY
+            }
+            when(widthType){
+                MeasureSpec.EXACTLY, MeasureSpec.UNSPECIFIED ->{
                     val totalHorizontalGap = (maxXUnits - 1) * mHorizontalGap
-                    val spaceWithoutGap = containerWidth - totalHorizontalGap
+                    val spaceWithoutGap = containerWidth - paddingStart - paddingEnd - totalHorizontalGap
                     mStandardUnitSize = (spaceWithoutGap.toFloat() / maxXUnits).roundToInt()
                     if(mStandardUnitSize > 0){
                         for(index in 0 until childCount){
                             val child = getChildAt(index)
                             val widthUnits = (child as? FlexChild)?.getWidthUnits()?:0
+                            val heightUnits = (child as? FlexChild)?.getHeightUnits()?:0
                             if(child.visibility != GONE) {
                                 val width = mStandardUnitSize * widthUnits + (widthUnits - 1) * mHorizontalGap
                                 val widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
-                                measureChild(child, widthSpec, heightMeasureSpec)
+                                val height = mStandardUnitSize * heightUnits + (heightUnits - 1) * mVerticalGap
+                                val heightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+                                child.measure(widthSpec, heightSpec)
                             }
                         }
                     }
-                    val totalHeight = mStandardUnitSize * maxYUnits + mHorizontalGap * (maxYUnits - 1)
+                    val totalHeight = mStandardUnitSize * maxYUnits + mVerticalGap * (maxYUnits - 1)
+                    setMeasuredDimension(containerWidth, totalHeight)
+                }
+                MeasureSpec.AT_MOST -> {
+                    for(index in 0 until childCount){
+                        val child = getChildAt(index)
+                        val widthUnits = (child as? FlexChild)?.getWidthUnits()?:0
+                        val heightUnits = (child as? FlexChild)?.getHeightUnits()?:0
+                        if(child.visibility != GONE) {
+                            val width = mStandardUnitSize * widthUnits + (widthUnits - 1) * mHorizontalGap
+                            val widthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY)
+                            val height = mStandardUnitSize * heightUnits + (heightUnits - 1) * mVerticalGap
+                            val heightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY)
+                            child.measure(widthSpec, heightSpec)
+                        }
+                    }
+                    val totalHeight = mStandardUnitSize * maxYUnits + mVerticalGap * (maxYUnits - 1)
                     setMeasuredDimension(containerWidth, totalHeight)
                 }
                 else -> {
-                    Log.e(TAG, "width of FlexGridGroup should be an exact size")
+                    val width = max(ViewCompat.getMinimumWidth(this), paddingStart+paddingEnd)
+                    val height = max(ViewCompat.getMinimumHeight(this), paddingTop+paddingBottom)
+                    setMeasuredDimension(width, height)
                 }
             }
         }
@@ -84,13 +110,17 @@ class FlexGridGroup<D>
             val childHeight = child.measuredHeight
             val startCoordinate = (child as? FlexChild)?.getStartCoordinate()
             startCoordinate?.also {
-                val left = it.second * (mStandardUnitSize + mHorizontalGap)
-                val top = it.first * (mStandardUnitSize + mHorizontalGap)
+                val left = paddingLeft + it.second * (mStandardUnitSize + mHorizontalGap)
+                val top = paddingTop + it.first * (mStandardUnitSize + mVerticalGap)
                 val right = left + childWidth
                 val bottom = top + childHeight
                 child.layout(left, top, right, bottom)
             }
         }
+    }
+
+    fun setStandUnitSize(pxSize: Int){
+        mStandardUnitSize = pxSize
     }
 
     fun addGrids(list: List<FlexChild>){
@@ -101,7 +131,6 @@ class FlexGridGroup<D>
             }
         }
     }
-
 
     private fun injectView(child: FlexChild){
         when(child){
@@ -117,37 +146,49 @@ class FlexGridGroup<D>
         }
     }
 
+    fun setAdapter(adapter: FlexAdapter<*>){
+        mAdapter = adapter
+    }
 
-    private fun bindAdapterData(list: List<D>){
+    fun getAdapter(): FlexAdapter<*>?{
+        return mAdapter
+    }
+
+    fun bindAdapterData(){
         for (index in 0 until childCount){
             val child = getChildAt(index) as? FlexChild
-            val data = list.getOrNull(index)
-            if(data != null && child != null) {
-                mCallBackList.forEach {
-                    it.onBind(data, child)
-                }
+            if(child != null) {
+                mAdapter?.bindDataAndView(index, child)
             }
         }
     }
 
-    fun addCallBack(@NonNull callBack: OnDataBindCallBack<D>){
-        mCallBackList.add(callBack)
-    }
+    abstract class FlexAdapter<D>{
 
-    fun removeCallBack(@NonNull callBack: OnDataBindCallBack<D>){
-        mCallBackList.remove(callBack)
-    }
+        private var mList = mutableListOf<D>()
+        fun submitData(group: View?, list: List<D>){
+            if(group !is FlexGridGroup){
+                Log.e(TAG, "groupView with this FlexAdapter is not FlexGridGroup!")
+                return
+            }
+            mList.clear()
+            mList.addAll(list)
+            group.bindAdapterData()
+        }
 
-    fun recycle(){
-        mCallBackList.clear()
-    }
+        fun bindDataAndView(position: Int, flexChild: FlexChild){
+            val data = mList.getOrNull(position)
+            if(data != null){
+                bind(data, flexChild)
+            }
+        }
 
-    fun submitData(list: List<D>){
-        bindAdapterData(list)
+        abstract fun bind(data:D, flexChild: FlexChild)
     }
 }
 
-interface OnDataBindCallBack<T>{
-    fun onBind(data: T, child: FlexChild)
-}
+
+
+
+
 
