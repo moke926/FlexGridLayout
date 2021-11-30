@@ -30,6 +30,8 @@ class TestAdapter: ListAdapter<FlexGroup, TestAdapter.MyViewHolder>(object: Item
         val groupView = LayoutInflater.from(parent.context)
             .inflate(R.layout.layout_test_item, null)
         (groupView as? FlexGridGroup)?.apply {
+            // generate the default layout frame,
+            // this step will decide the approximate appearance of this flexgridgroup
             val list = DefaultLayoutConfiguration.generateGroup(parent.context, viewType)
             addGrids(list)
             setAdapter(adapter)
