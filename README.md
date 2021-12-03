@@ -18,7 +18,18 @@
 </div>
 
 ### 导入
-Gradle:
+
+项目 build.gradle:
+```gradle
+buildscript {
+    repositories {
+        ...
+        mavenCentral()
+    }
+    ...
+}
+```
+需要导入的模块 Gradle:
 ```gradle
 implementation 'io.github.moke926:flexgrid:1.0.0'
 ```
@@ -99,4 +110,3 @@ class TestFlexAdapter: FlexGridGroup.FlexAdapter<FlexItem>() {
 *    item变化的动画
 
 欢迎朋友一起来讨论和完善此框架。
-
