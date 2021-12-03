@@ -7,5 +7,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "FlexGridLayout"
-include ':sample'
+include ':example'
 include ':flexgrid'
