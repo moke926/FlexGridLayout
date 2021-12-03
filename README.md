@@ -10,10 +10,6 @@
 </div>
 
 <div align=center>
-<img src="https://github.com/moke926/media-resources/blob/main/images/Screenshot_1638279091.png" width=30%/>
-</div>
-
-<div align=center>
 <img src="https://github.com/moke926/media-resources/blob/main/images/Screenshot_1638279116.png" width=30%/>
 </div>
 
