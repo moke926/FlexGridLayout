@@ -10,7 +10,6 @@ import com.android.flexgrid2.adapters.FlexAdapter
 import com.android.flexgrid2.constants.TouchMode.Companion.TOUCH_MODE_DONE_WAITING
 import com.android.flexgrid2.constants.TouchMode.Companion.TOUCH_MODE_DOWN
 import com.android.flexgrid2.constants.TouchMode.Companion.TOUCH_MODE_REST
-import com.android.flexgrid2.constants.TouchMode.Companion.TOUCH_MODE_TAP
 import com.android.flexgrid2.listeners.OnItemClickListener
 import com.android.flexgrid2.listeners.OnItemLongClickListener
 import kotlin.math.max
@@ -298,14 +297,13 @@ open class FlexGridGroup
 
     private fun onTouchUp(event: MotionEvent){
         when(mTouchMode) {
-            TOUCH_MODE_DOWN, TOUCH_MODE_TAP, TOUCH_MODE_DONE_WAITING -> {
+            TOUCH_MODE_DOWN, TOUCH_MODE_DONE_WAITING -> {
                 val motionPosition = mMotionPosition
                 val child = getChildAt(motionPosition)
                 if (child != null && !child.hasExplicitFocusable()) {
-                    if(mTouchMode == TOUCH_MODE_DOWN || mTouchMode == TOUCH_MODE_TAP) {
+                    if(mTouchMode == TOUCH_MODE_DOWN) {
                         removeCallbacks(mPerformLongClick)
                         if (!mDataChanged) {
-                            mTouchMode = TOUCH_MODE_TAP
                             child.isPressed = true
                             isPressed = true
                             if (mTouchResetRequest != null) {

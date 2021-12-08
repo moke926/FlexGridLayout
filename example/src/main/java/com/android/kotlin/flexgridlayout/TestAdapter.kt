@@ -20,11 +20,11 @@ import com.bumptech.glide.Glide
 
 class TestAdapter: ListAdapter<FlexGroup, TestAdapter.MyViewHolder>(object: ItemCallback<FlexGroup>(){
     override fun areItemsTheSame(oldItem: FlexGroup, newItem: FlexGroup): Boolean {
-        return oldItem == newItem
+        return oldItem.index == newItem.index
     }
 
     override fun areContentsTheSame(oldItem: FlexGroup, newItem: FlexGroup): Boolean {
-        return oldItem == newItem
+        return oldItem.itemList.size == newItem.itemList.size
     }
 }), Observer<List<FlexGroup>> {
 
@@ -76,7 +76,12 @@ class TestAdapter: ListAdapter<FlexGroup, TestAdapter.MyViewHolder>(object: Item
     }
 
     override fun onChanged(t: List<FlexGroup>?) {
-        submitList(t)
+        val list = mutableListOf<FlexGroup>()
+        t?.forEach {
+            val itemList = it.itemList.toList()
+            list.add(FlexGroup(it.index, itemList))
+        }
+        submitList(list)
     }
 }
 

@@ -39,6 +39,34 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         val recyclerView = binding.rvTest
         val adapter = TestAdapter()
+
+        //test: add a item into first flexGridGroup
+        binding.addFloatActionButton.apply {
+            setOnClickListener {
+                val value = mData.value
+
+                value?.also {
+                    val first = it[0]
+                    val list = first.itemList as MutableList
+                    list.add(FlexItem(R.mipmap.test001))
+                }
+
+                mData.postValue(value)
+            }
+        }
+
+        //test: remove a item from first flexGridGroup
+        binding.removeFloatActionButton.apply {
+            setOnClickListener {
+                val value = mData.value
+                value?.also {
+                    val first = it[0]
+                    val list = first.itemList as MutableList
+                    list.removeLast()
+                }
+                mData.postValue(value)
+            }
+        }
         recyclerView.adapter = adapter
         val mVerticalGap = resources.getDimensionPixelOffset(R.dimen.test_vertical_gap)
         recyclerView.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
